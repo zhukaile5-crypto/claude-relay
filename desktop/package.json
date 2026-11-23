@@ -1,0 +1,51 @@
+{
+  "name": "claude-relay-desktop",
+  "productName": "Claude",
+  "version": "0.9.0",
+  "description": "claude-relay.example 的 Windows 桌面端",
+  "author": "claude-relay.example",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "org.clauderelay.desktop",
+    "productName": "Claude",
+    "copyright": "© 2026 claude-relay.example",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "folders.js",
+      "offline.html",
+      "confirm.html",
+      "confirm-preload.js",
+      "icons/**"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icons/icon.png",
+      "artifactName": "Claude-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "runAfterFinish": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Claude",
+      "uninstallDisplayName": "Claude",
+      "deleteAppDataOnUninstall": false,
+      "installerLanguages": ["zh_CN"],
+      "language": "2052"
+    }
+  },
+  "devDependencies": {
+    "electron": "^38.8.6",
+    "electron-builder": "^26.18.0"
+  }
+}

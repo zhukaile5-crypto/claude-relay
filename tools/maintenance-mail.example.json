@@ -1,0 +1,7 @@
+{
+  "enabled": false,
+  "endpoint": "https://YOUR-MAIL-WORKER.example.invalid/notify",
+  "secretEnv": "CLAUDE_RELAY_MAIL_SECRET",
+  "stateDir": "D:\\Claude云端传输\\data\\maintenance\\mail",
+  "retryMs": 900000
+}

@@ -1,0 +1,16 @@
+# 构建产物和本机缓存
+/.hvigor/
+/.idea/
+/build/
+/entry/build/
+/entry/.preview/
+/oh_modules/
+/entry/oh_modules/
+/local.properties
+/oh-package-lock.json5
+/entry/oh-package-lock.json5
+# 签名材料（自动签名生成在用户目录 .ohos/config 里，这里防止误放进来）
+*.p12
+*.p7b
+*.cer
+*.csr

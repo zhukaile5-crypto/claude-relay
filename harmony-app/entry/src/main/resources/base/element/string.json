@@ -1,0 +1,8 @@
+{
+  "string": [
+    { "name": "module_desc", "value": "Claude 聊天" },
+    { "name": "EntryAbility_desc", "value": "Claude 聊天" },
+    { "name": "EntryAbility_label", "value": "Claude" },
+    { "name": "mic_reason", "value": "语音输入时录音，转成文字发给 Claude" }
+  ]
+}

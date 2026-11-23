@@ -1,0 +1,10 @@
+# 机密和运行数据，不进版本库
+config.json
+data/
+logs/
+cloudflared/
+node_modules/
+wake-worker/.wrangler/
+desktop/node_modules/
+desktop/dist/
+__pycache__/

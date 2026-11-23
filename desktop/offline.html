@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Claude</title>
+<style>
+  :root { --bg: #faf9f5; --fg: #3d3929; --muted: #83827d; --accent: #c96442; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #262624; --fg: #e8e6dc; --muted: #9c9a92; } }
+  body { margin: 0; height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--fg);
+    font: 15px/1.6 system-ui, "Microsoft YaHei UI", sans-serif; text-align: center; }
+  h1 { font-size: 20px; font-weight: 600; margin: 0 0 8px; }
+  p { color: var(--muted); margin: 0 0 20px; }
+  button { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 9px 22px; font: inherit; cursor: pointer; }
+</style>
+</head>
+<body>
+<div>
+  <h1>连不上网络</h1>
+  <p>请检查这台电脑的网络，联网后会自动重试。</p>
+  <button onclick="window.relayDesktop.retry()">再试一次</button>
+</div>
+<script>
+  addEventListener('online', () => window.relayDesktop.retry());
+  setInterval(() => navigator.onLine && window.relayDesktop.retry(), 30000);
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+name = "claude-wake"
+main = "worker.js"
+compatibility_date = "2025-06-01"
+workers_dev = false
+
+# 只接管首页（电脑睡着时返回睡觉页面）和叫醒接口，其余流量（接口、文件、实时推送）照旧直接走隧道
+routes = [
+  { pattern = "claude-relay.example/", zone_name = "claude-relay.example" },
+  { pattern = "claude-relay.example/__wake*", zone_name = "claude-relay.example" },
+]
+
+# KV 命名空间的 id 由 setup 时 `wrangler kv namespace create WAKE` 生成后填入
+[[kv_namespaces]]
+binding = "WAKE"
+id = "a00291182c484a4ea2cfbeedc3e8eaf4"

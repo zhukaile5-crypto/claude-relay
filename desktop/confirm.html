@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Claude</title>
+<style>
+  /* 颜色、圆角、字体都照着网页（public/index.html 的 :root）来，看上去是同一个应用里弹出来的 */
+  :root {
+    --surface: #fffefb; --text: #141413; --text2: #3d3d3a; --muted: #75736c; --line: rgba(31,30,29,.11); --line2: rgba(31,30,29,.2);
+    --hover: rgba(31,30,29,.055); --code: #f5f3ee; --accent: #d97757; --accent-strong: #c15f3c; --accent-soft: rgba(217,119,87,.12);
+    --serif: "Anthropic Serif", "Source Serif 4", "Noto Serif SC", Georgia, "Microsoft YaHei UI", serif;
+    --sans: "Anthropic Sans", "Inter", "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+    --mono: "Cascadia Code", Consolas, "Microsoft YaHei UI", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --surface: #30302e; --text: #faf9f5; --text2: #e2dfd6; --muted: #a39f96; --line: rgba(255,255,255,.09); --line2: rgba(255,255,255,.18);
+      --hover: rgba(255,255,255,.055); --code: #262624; --accent-soft: rgba(217,119,87,.16); }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--surface); color: var(--text2); font: 14px/1.65 var(--sans); -webkit-font-smoothing: antialiased; overflow: hidden; user-select: none; cursor: default; }
+  #box { padding: 24px 26px 20px; }
+  .head { display: flex; gap: 12px; align-items: flex-start; -webkit-app-region: drag; }
+  .mark { flex: none; width: 30px; height: 30px; border-radius: 9px; background: var(--accent-soft); color: var(--accent-strong); display: grid; place-items: center; margin-top: 1px; }
+  .mark svg { width: 17px; height: 17px; }
+  h1 { margin: 0; font: 600 17px/1.5 var(--sans); color: var(--text); letter-spacing: .01em; padding-top: 2px; }
+  .body { margin: 12px 0 0 42px; }
+  .path { display: block; margin: 0 0 12px; padding: 7px 11px; border-radius: 9px; background: var(--code); border: 1px solid var(--line); color: var(--text);
+    font: 12.5px/1.5 var(--mono); overflow-wrap: anywhere; user-select: text; cursor: text; }
+  p { margin: 0 0 10px; }
+  .fact { display: flex; gap: 10px; margin: 0 0 10px; padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line); }
+  .fact .k { flex: none; color: var(--muted); font-size: 12.5px; padding-top: 1.5px; min-width: 2.2em; }
+  .fact .v { min-width: 0; }
+  .fact .v b { font-weight: 600; color: var(--text); }
+  .fact .v span { display: block; color: var(--muted); font-size: 12.5px; line-height: 1.6; margin-top: 1px; }
+  .note { color: var(--muted); font-size: 12.5px; margin: 2px 0 0; }
+  .foot { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; }
+  button { font: 500 13.5px/1 var(--sans); height: 36px; padding: 0 17px; border-radius: 10px; border: 1px solid var(--line2); background: transparent; color: var(--text2); cursor: pointer;
+    transition: background .15s, border-color .15s, box-shadow .15s; }
+  button:hover { background: var(--hover); }
+  button:focus-visible { outline: none; border-color: var(--muted); box-shadow: 0 0 0 3px var(--hover); }
+  #ok { background: var(--accent); border-color: transparent; color: #fff; }
+  #ok:hover { background: var(--accent-strong); }
+  #ok:focus-visible { border-color: transparent; box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 1px var(--accent-strong); }
+</style>
+</head>
+<body>
+<div id="box">
+  <div class="head">
+    <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h3.9l2 2.2h7.1a2 2 0 0 1 2 2v7.8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg></span>
+    <h1 id="title"></h1>
+  </div>
+  <div class="body" id="body"></div>
+  <div class="foot"><button id="cancel"></button><button id="ok"></button></div>
+</div>
+<script>
+  // 内容全部当文字放进去（textContent），不当成网页代码
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = String(text); return n; };
+  window.confirmBox.spec().then((s) => {
+    s = s || {};
+    document.getElementById('title').textContent = s.title || '';
+    const body = document.getElementById('body');
+    if (s.path) { // 路径太长要折行时，折在斜杠后面，不把一个文件夹名拦腰切断
+      const code = el('code', 'path');
+      String(s.path).split(/(?<=[\\/])/).forEach((part, i) => { if (i) code.append(document.createElement('wbr')); code.append(part); });
+      body.append(code);
+    }
+    for (const text of s.paras || []) if (text) body.append(el('p', '', text));
+    for (const [k, v, more] of s.facts || []) {
+      const row = el('div', 'fact'), val = el('div', 'v');
+      val.append(el('b', '', v)); if (more) val.append(el('span', '', more));
+      row.append(el('div', 'k', k), val); body.append(row);
+    }
+    if (s.note) body.append(el('p', 'note', s.note));
+    const cancel = document.getElementById('cancel'), ok = document.getElementById('ok');
+    cancel.textContent = s.cancel || '取消'; ok.textContent = s.ok || '确定';
+    cancel.onclick = () => window.confirmBox.answer(false);
+    ok.onclick = () => window.confirmBox.answer(true);
+    cancel.focus(); // 手一滑按了回车，是「不」
+    requestAnimationFrame(() => window.confirmBox.size(Math.ceil(document.getElementById('box').getBoundingClientRect().height)));
+  });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') window.confirmBox.answer(false); });
+</script>
+</body>
+</html>

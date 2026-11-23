@@ -1,0 +1,23 @@
+{
+  // 只作样例；复制为 wrangler.local.jsonc 后由 Claude 验收并安排部署。
+  "name": "claude-relay-maintenance-mail",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "vars": {
+    "MAIL_FROM": "relay@example.invalid",
+    "MAIL_TO": "owner@example.invalid"
+  },
+  // 收件地址必须预先在 Cloudflare 账户中验证；同时替换上面的 MAIL_TO。
+  "send_email": [
+    { "name": "EMAIL", "destination_address": "owner@example.invalid" }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "MAIL_GATE", "class_name": "MaintenanceMailGate" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["MaintenanceMailGate"] }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "mcpServers": {
+    "consensus": { "type": "http", "url": "https://mcp.consensus.app/mcp" },
+    "reference-lookup": { "type": "http", "url": "https://research-desk-checker.fly.dev/mcp" }
+  }
+}
